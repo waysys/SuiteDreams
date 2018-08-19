@@ -30,6 +30,7 @@ This module is the main program for running SuiteDreams.
 import sys
 from productspec import ProductSpec
 import traceback
+from suitedreamsexception import SuiteDreamsException
 
 # -------------------------------------------------------------------------------
 #  Main Function
@@ -49,15 +50,16 @@ def main(product_spec_filename, test_suite_library):
     try:
         product_spec = ProductSpec()
         product_spec.spec_file_name = product_spec_filename
-        process(product_spec)
-    except Exception:
+        process(product_spec, test_suite_library)
+    except SuiteDreamsException as e:
+        print("Error: " + str(e))
         info = sys.exc_info()
-        print("Exception: " + str(info[1]))
         tb = info[2]
         traceback.print_tb(tb)
+        sys.exit(1)
     finally:
         print("Ending SuiteDreams")
-    return
+    sys.exit(0)
 
 
 def process(product_spec, test_suite_library):
