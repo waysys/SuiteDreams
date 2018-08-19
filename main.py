@@ -31,6 +31,7 @@ import sys
 from productspec import ProductSpec
 import traceback
 from suitedreamsexception import SuiteDreamsException
+from suitebuilder import SuiteBuilder
 
 # -------------------------------------------------------------------------------
 #  Main Function
@@ -45,11 +46,11 @@ def main(product_spec_filename, test_suite_library):
         product_spec_filename - the file name of the product spec
         test_suite_library - the directory that holds test suites
     """
-    print("Starting SuiteDreams with product spec " + product_spec_filename)
-    print("Test suite will be generted in directory " + test_suite_library)
+    print("Starting SuiteDreams")
+    validate(product_spec_filename, test_suite_library)
+
     try:
-        product_spec = ProductSpec()
-        product_spec.spec_file_name = product_spec_filename
+        product_spec = ProductSpec(product_spec_filename)
         process(product_spec, test_suite_library)
     except SuiteDreamsException as e:
         print("Error: " + str(e))
@@ -62,13 +63,41 @@ def main(product_spec_filename, test_suite_library):
     sys.exit(0)
 
 
+def validate(product_spec_filename, test_suite_library):
+    """
+    Check that the product spec file name and the test suite library directory are not null or empty
+
+    Arguments:
+        product_spec_filename - name of product specification file
+        test_suite_library - name of directory where the test suite is placed
+    """
+    if product_spec_filename is None:
+        print("Product specification file must not be None")
+        sys.exit(1)
+    if len(product_spec_filename) == 0:
+        print("Product specification file name must not be an empty string")
+        sys.exit(1)
+    print("Product specification file is " + product_spec_filename)
+    if test_suite_library is None:
+        print("Test suite library must not be None")
+        sys.exit(1)
+    if len(test_suite_library) == 0:
+        print("Test suite library must not be an empty string")
+        sys.exit(1)
+    print("Test suite will be generted in directory " + test_suite_library)
+    return
+
+
 def process(product_spec, test_suite_library):
     """
     Read the product spec and geneerate the number of test cases specified.
 
     Arguments:
         product_spec - the instance of the product spec class.
+        test_suite_library - the path to the directory that will hold the test suite
     """
+    suite_builder = SuiteBuilder(product_spec, test_suite_library)
+    suite_builder.parse_spec()
     return
 
 # ---------------------------------------------------------------------------

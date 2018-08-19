@@ -29,6 +29,8 @@ from productspec import ProductSpec
 #  Test Product Spec
 # -------------------------------------------------------------------------------
 
+filename = "/proj/SuiteDreams/testsuite1.xml"
+
 
 class TestProductSpec(unittest.TestCase):
     """
@@ -41,7 +43,7 @@ class TestProductSpec(unittest.TestCase):
 
     def setUp(self):
         """Create an instance of ProductSpec"""
-        self._product_spec = ProductSpec()
+        self._product_spec = ProductSpec(filename)
         return
 
     def tearDown(self):
@@ -55,7 +57,13 @@ class TestProductSpec(unittest.TestCase):
 
     def test_spec_file_name(self):
         """Test that spec file name can be set and read"""
-        filename = "/proj/homeowners.xml"
-        self._product_spec.spec_file_name = filename
         self.assertEqual(filename, self._product_spec.spec_file_name)
+        return
+
+    def test_file_exists(self):
+        """Test that the file_exist function works"""
+        result = self._product_spec.file_exists(filename)
+        self.assertTrue(result)
+        result = self._product_spec.file_exists("XX")
+        self.assertTrue(not result)
         return

@@ -35,21 +35,14 @@ class SuiteBuilder:
     which generate the test case files.
     """
 
-    def __init__(self, product_spec, test_suite_library):
+    def __init__(self, test_suite_library):
         """
         Initialize this class.
 
         Arguments:
-            product_spec - the product specification
             test_suite_library - the directory where the test suite will be placed
         """
-        assert product_spec is not None, "SuiteBuilder: product spec must not be null"
         assert test_suite_library is not None, "SuiteBuilder: test suite library must not be null"
         assert len(test_suite_library) > 0, "SuiteBuilder: test suit library must not be empty"
-        self._product_spec = product_spec
         self._test_suite_library = test_suite_library
 
-    def parse_spec(self):
-        """
-        Parse the product spec file
-        """
