@@ -57,5 +57,5 @@ class TestProductSpec(unittest.TestCase):
         """Test that spec file name can be set and read"""
         filename = "/proj/homeowners.xml"
         self._product_spec.spec_file_name = filename
-        self.assertEquals(filename, self._product_spec.spec_file_name)
+        self.assertEqual(filename, self._product_spec.spec_file_name)
         return
