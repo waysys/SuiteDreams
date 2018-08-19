@@ -60,7 +60,7 @@ def main(product_spec_filename, test_suite_library):
     return
 
 
-def process(product_spec):
+def process(product_spec, test_suite_library):
     """
     Read the product spec and geneerate the number of test cases specified.
 
