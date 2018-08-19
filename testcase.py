@@ -19,30 +19,34 @@ __author__ = 'Bill Shaffer'
 __version__ = "1.00"
 
 """
-This module holds the SuiteBuilder class.
+The test case module contains the TestCase class.
 """
 
-from suitedreamsexception import SuiteDreamsException
 
 # -------------------------------------------------------------------------------
-#  SuiteBuilder class
+#  Test Case Class
 # -------------------------------------------------------------------------------
 
 
-class SuiteBuilder:
+class TestCase:
     """
-    The SuiteBuilder class controls the invocation of the FileBuilder instances,
-    which generate the test case files.
+    The TestCase class models an HTML file used for GFIT test cases.
     """
 
-    def __init__(self, test_suite_library):
-        """
-        Initialize this class.
+    # ---------------------------------------------------------------------------
+    #  Constructor
+    # ---------------------------------------------------------------------------
 
-        Arguments:
-            test_suite_library - the directory where the test suite will be placed
+    def __init__(self, filename):
         """
-        assert test_suite_library is not None, "SuiteBuilder: test suite library must not be null"
-        assert len(test_suite_library) > 0, "SuiteBuilder: test suit library must not be empty"
-        self._test_suite_library = test_suite_library
+        Initialize the class.
 
+        Argument:
+            filename - the name of the file to be created.
+        """
+        assert filename is not None, "File name must not be None"
+        assert len(filename) > 0, "File name must not be an empty string"
+        self._filename = filename
+        return
+
+    

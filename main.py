@@ -31,7 +31,8 @@ import sys
 from productspec import ProductSpec
 import traceback
 from suitedreamsexception import SuiteDreamsException
-from suitebuilder import SuiteBuilder
+from filebuilder import FileBuilder
+
 
 # -------------------------------------------------------------------------------
 #  Main Function
@@ -96,9 +97,16 @@ def process(product_spec, test_suite_library):
         product_spec - the instance of the product spec class.
         test_suite_library - the path to the directory that will hold the test suite
     """
-    suite_builder = SuiteBuilder(product_spec, test_suite_library)
-    suite_builder.parse_spec()
+    product_spec.parse()
+    suite_name = product_spec.suite_name
+    count = product_spec.count
+    print("SuiteDreams is producing " + str(count) + " test cases in test suite " + suite_name)
+    for num in range(count):
+        print("Processing testcase " + str(num + 1))
+        file_builder = FileBuilder(product_spec, test_suite_library)
+        file_builder.produce_test_case()
     return
+
 
 # ---------------------------------------------------------------------------
 #  Main

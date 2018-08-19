@@ -50,6 +50,8 @@ class ProductSpec:
         """
         self._spec_file_name = filename
         self._root = None
+        self._count = None
+        self._suite_name = None
         return
 
     # ---------------------------------------------------------------------------
@@ -66,10 +68,28 @@ class ProductSpec:
     @property
     def count(self):
         """
-        Return the numbber of test cases to be created.
+        Return the number of test cases to be created.
         """
+        if self._count is None:
+            text = self.fetch_text(self._root, "Count")
+            try:
+                self._count = int(text)
+            except Exception:
+                message = "Text in Count element is not a number - '" + text + "'"
+                raise SuiteDreamsException(message)
+            if self._count < 0:
+                message = "Count must not be a negative number - " + text
+                raise SuiteDreamsException(message)
+        return self._count
 
-        return
+    @property
+    def suite_name(self):
+        """
+        Return the name of the test suite.
+        """
+        if self._suite_name is None:
+            self._suite_name = self.fetch_text(self._root, "SuiteName")
+        return self._suite_name
 
     # ---------------------------------------------------------------------------
     #  Operations
@@ -98,3 +118,40 @@ class ProductSpec:
         """
         file = Path(filename)
         return file.is_file()
+
+    def fetch_element(self, parent, tag):
+        """
+        Return the single element named in the tag argument. This method should be used only when
+        only one element with this name is used.  If the element is not found, an exception
+        is thrown.
+
+        Argument:
+            parent - the parent of the element being searched for
+            tag - the name of the element to be retrieved
+
+        Returns:
+            The element being searched for.
+        """
+        assert tag is not None, "fetch_element: Tag must not be None"
+        assert len(tag) > 0, "fetch_element: Tag must not be an empty string"
+        assert parent is not None, "fetch_element: Parent of element " + tag + " must not be None"
+        element = parent.find(tag)
+        if element is None:
+            message = "Element " + tag + " was not found in element " + parent.tag
+            raise SuiteDreamsException(message)
+        return element
+
+    def fetch_text(self, parent, tag):
+        """
+        Return the content of an element with the name equal to tag.  If the element is not found,
+        an exception is thrown.
+
+        Argument:
+            parent - the parent of the element being searched for
+            tag - the name of the element to be retrieved
+
+        Returns:
+            The content of the element being searched for.
+        """
+        element = self.fetch_element(parent, tag)
+        return element.text
