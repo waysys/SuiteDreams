@@ -22,7 +22,7 @@ __version__ = "1.00"
 This module contains the class representing the product specification.  
 """
 
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as Et
 from pathlib import Path
 from suitedreamsexception import SuiteDreamsException
 
@@ -52,6 +52,10 @@ class ProductSpec:
         self._root = None
         self._count = None
         self._suite_name = None
+        self._suite_id = None
+        self._project = None
+        self._author = None
+        self._description = None
         return
 
     # ---------------------------------------------------------------------------
@@ -91,6 +95,42 @@ class ProductSpec:
             self._suite_name = self.fetch_text(self._root, "SuiteName")
         return self._suite_name
 
+    @property
+    def suite_id(self):
+        """
+        Return the suite id.  This string is used to form the file names for test cases.
+        """
+        if self._suite_id is None:
+            self._suite_id = self.fetch_text(self._root, "SuiteId")
+        return self._suite_id
+
+    @property
+    def project(self):
+        """
+        Return the name of the project.
+        """
+        if self._project is None:
+            self._project = self.fetch_text(self._root, "ProjectName")
+        return self._project
+
+    @property
+    def author(self):
+        """
+        Return the author of the test case.
+        """
+        if self._author is None:
+            self._author = self.fetch_text(self._root, "Author")
+        return self._author
+
+    @property
+    def description(self):
+        """
+        Return the description of the test case.
+        """
+        if self._description is None:
+            self._description = self.fetch_text(self._root, "Description")
+        return self._description
+
     # ---------------------------------------------------------------------------
     #  Operations
     # ---------------------------------------------------------------------------
@@ -99,10 +139,10 @@ class ProductSpec:
         """
         Parse the product spec file
         """
-        if not self.file_exists(self.spec_file_name):
+        if not ProductSpec.file_exists(self.spec_file_name):
             raise SuiteDreamsException("Product spec file does not exist - " + self.spec_file_name)
         try:
-            tree = ET.parse(self.spec_file_name)
+            tree = Et.parse(self.spec_file_name)
             root = tree.getroot()
             tag = root.tag
             if tag != "TestSuite":
@@ -112,14 +152,16 @@ class ProductSpec:
             raise SuiteDreamsException(str(e))
         return
 
-    def file_exists(self, filename):
+    @staticmethod
+    def file_exists(filename):
         """
         Return true if the file exists and is readable
         """
         file = Path(filename)
         return file.is_file()
 
-    def fetch_element(self, parent, tag):
+    @staticmethod
+    def fetch_element(parent, tag):
         """
         Return the single element named in the tag argument. This method should be used only when
         only one element with this name is used.  If the element is not found, an exception
@@ -137,11 +179,12 @@ class ProductSpec:
         assert parent is not None, "fetch_element: Parent of element " + tag + " must not be None"
         element = parent.find(tag)
         if element is None:
-            message = "Element " + tag + " was not found in element " + parent.tag
+            message = "fetch_element: Element " + tag + " was not found in element " + parent.tag
             raise SuiteDreamsException(message)
         return element
 
-    def fetch_text(self, parent, tag):
+    @staticmethod
+    def fetch_text(parent, tag):
         """
         Return the content of an element with the name equal to tag.  If the element is not found,
         an exception is thrown.
@@ -153,5 +196,7 @@ class ProductSpec:
         Returns:
             The content of the element being searched for.
         """
-        element = self.fetch_element(parent, tag)
+        element = ProductSpec.fetch_element(parent, tag)
         return element.text
+
+

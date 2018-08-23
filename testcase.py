@@ -293,6 +293,27 @@ class TestCase:
         self.table.append(tr)
         return
 
+    def add_row_attrib(self, values, attrib):
+        """
+        Add a row to the table and place attributes on the first cell in the row.
+
+        Arguments:
+            values - a list of between 1 and 5 strings for the content of the row.
+            attrib - a dictionary with attributes on the first
+        """
+        assert values is not None
+        assert len(values) > 0, "add_row_attrib: there must be at least one value in a row"
+        assert len(values) < 6, "add_row_attrib: there must be no more than 5 values in a row"
+        tr = Element("tr")
+        td = Element("td", attrib)
+        td.text = values.pop(0)
+        tr.append(td)
+        for value in values:
+            td = Element("td")
+            td.text = value
+            tr.append(td)
+        self.table.append(tr)
+
     # ---------------------------------------------------------------------------
     #  Output Operations
     # ---------------------------------------------------------------------------

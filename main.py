@@ -32,6 +32,7 @@ from productspec import ProductSpec
 import traceback
 from suitedreamsexception import SuiteDreamsException
 from filebuilder import FileBuilder
+from pathlib import Path
 
 
 # -------------------------------------------------------------------------------
@@ -49,12 +50,18 @@ def main(product_spec_filename, test_suite_library):
     """
     print("Starting SuiteDreams")
     validate(product_spec_filename, test_suite_library)
+    validate_test_suite_library(test_suite_library)
 
     try:
-        product_spec = ProductSpec(product_spec_filename)
-        process(product_spec, test_suite_library)
+        process(product_spec_filename, test_suite_library)
     except SuiteDreamsException as e:
         print("Error: " + str(e))
+        info = sys.exc_info()
+        tb = info[2]
+        traceback.print_tb(tb)
+        sys.exit(1)
+    except Exception as e:
+        print("Exception: " + str(e))
         info = sys.exc_info()
         tb = info[2]
         traceback.print_tb(tb)
@@ -89,24 +96,59 @@ def validate(product_spec_filename, test_suite_library):
     return
 
 
-def process(product_spec, test_suite_library):
+def validate_test_suite_library(test_suite_library):
+    """
+    Check that the test suite library exists and is a directory.
+
+    Arguments:
+        test_suite_library - the name of the directory that will hold the test suite directories
+    """
+    path = Path(test_suite_library)
+    if not path.is_dir():
+        print("Test suite library does not exist or is not a directory - " + test_suite_library)
+        sys.exit(1)
+    return
+
+
+def process(product_spec_filename, test_suite_library):
     """
     Read the product spec and geneerate the number of test cases specified.
 
     Arguments:
-        product_spec - the instance of the product spec class.
+        product_spec_filename - the product specification filename.
         test_suite_library - the path to the directory that will hold the test suite
     """
+    product_spec = ProductSpec(product_spec_filename)
     product_spec.parse()
     suite_name = product_spec.suite_name
+    validate_test_suite_dir(test_suite_library, suite_name)
     count = product_spec.count
     print("SuiteDreams is producing " + str(count) + " test cases in test suite " + suite_name)
     for num in range(count):
         print("Processing testcase " + str(num + 1))
-        file_builder = FileBuilder(product_spec, test_suite_library)
+        file_builder = FileBuilder(product_spec, test_suite_library, num + 1)
         file_builder.produce_test_case()
     return
 
+
+def validate_test_suite_dir(test_suite_library, suite_name):
+    """
+    Verify that the test suite directory does not exist yeet.
+    Then create it.
+
+    Arguments:
+         test_suite_library - the diretory that holds test suites.
+         suite_name - the name of the test suite.  This will be the name of the subdirectory in
+            the test suite library
+    """
+    if suite_name is None or len(suite_name) == 0:
+        raise SuiteDreamsException("Test suite name must not be None or an empty string")
+    test_suite_dir = test_suite_library + "/" + suite_name
+    path = Path(test_suite_dir)
+    if path.exists():
+        raise SuiteDreamsException("Test suite directory already exists - " + test_suite_dir)
+    path.mkdir(mode=0o777, parents=False, exist_ok=False)
+    return
 
 # ---------------------------------------------------------------------------
 #  Main
