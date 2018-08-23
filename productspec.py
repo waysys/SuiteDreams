@@ -56,6 +56,8 @@ class ProductSpec:
         self._project = None
         self._author = None
         self._description = None
+        self._seed = None
+        self._product_name = None
         return
 
     # ---------------------------------------------------------------------------
@@ -131,6 +133,32 @@ class ProductSpec:
             self._description = self.fetch_text(self._root, "Description")
         return self._description
 
+    @property
+    def root_element(self):
+        """Return the TestSuite element in the product specification"""
+        assert self._root is not None, "root_element: root element in product spec must be set"
+        return self._root
+
+    @property
+    def seed(self):
+        """Return the seed for the random number generator"""
+        if self._seed is None:
+            value = self.fetch_text(self._root, "Seed")
+            try:
+                self._seed = int(value)
+            except ValueError:
+                message = "Value for seed is not a valid integer - " + value
+                raise SuiteDreamsException(message)
+        return self._seed
+
+    @property
+    def product_name(self):
+        """Return the product name"""
+        if self._product_name is None:
+            product_element = self.fetch_element(self.root_element, "Product")
+            self._product_name = self.fetch_text(product_element, "ProductCode")
+        return self._product_name
+
     # ---------------------------------------------------------------------------
     #  Operations
     # ---------------------------------------------------------------------------
@@ -199,4 +227,19 @@ class ProductSpec:
         element = ProductSpec.fetch_element(parent, tag)
         return element.text
 
+    @staticmethod
+    def fetch_all_elements(parent, tag):
+        """
+        Return a list of subelements of the parent with the specified tag.
 
+        Arguments:
+            parent - the parent element being searched
+            tag - the tag of the element
+        """
+        assert tag is not None, "fetch_all_element: Tag must not be None"
+        assert len(tag) > 0, "fetch_all_element: Tag must not be an empty string"
+        assert parent is not None, "fetch_all_element: Parent of element " + tag + " must not be None"
+        elements = parent.findall(tag)
+        if elements is None:
+            elements = []
+        return elements
