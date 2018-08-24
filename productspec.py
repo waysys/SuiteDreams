@@ -159,6 +159,25 @@ class ProductSpec:
             self._product_name = self.fetch_text(product_element, "ProductCode")
         return self._product_name
 
+    @property
+    def should_quote(self):
+        """
+        Return True if the submission should be quoted.
+        """
+        product_element = self.fetch_element(self.root_element, "Policy")
+        has_quote_element = ProductSpec.has_element(product_element, "Quote")
+        has_bind_element = ProductSpec.has_element(product_element, "Bind")
+        return has_quote_element or has_bind_element
+
+    @property
+    def should_bind(self):
+        """
+        Return True if the submission should be bound.
+        """
+        product_element = self.fetch_element(self.root_element, "Policy")
+        has_bind_element = ProductSpec.has_element(product_element, "Bind")
+        return has_bind_element
+
     # ---------------------------------------------------------------------------
     #  Operations
     # ---------------------------------------------------------------------------
@@ -243,3 +262,15 @@ class ProductSpec:
         if elements is None:
             elements = []
         return elements
+
+    @staticmethod
+    def has_element(parent, tag):
+        """
+        Return a list of subelements of the parent with the specified tag.
+
+        Arguments:
+            parent - the parent element being searched
+            tag - the tag of the element
+        """
+        result = ProductSpec.fetch_all_elements(parent, tag)
+        return len(result) > 0

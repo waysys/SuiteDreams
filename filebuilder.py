@@ -173,6 +173,8 @@ class FileBuilder:
         self.test_case.initialize()
         self.process_policy()
         self.process_product()
+        self.process_quote()
+        self.process_bind()
         self.test_case.output()
         return
 
@@ -395,6 +397,30 @@ class FileBuilder:
             raise SuiteDreamsException(message)
         value = self.process_values(coverage_term_element, coverage_term_code, "Term")
         self.add_with(coverage_term_code, value)
+        return
+
+    # ---------------------------------------------------------------------------
+    #  Operations for Quote and Bind
+    # ---------------------------------------------------------------------------
+
+    def process_quote(self):
+        """
+        Output the rows to have the submission quoted
+        """
+        if self.product_spec.should_quote:
+            self.add_check_property("CanRequestQuote", "true")
+            self.add_command("quote")
+            self.add_check_property("Status", "Quoted")
+        return
+
+    def process_bind(self):
+        """
+        Output the rows to have the submission bound.
+        """
+        if self.product_spec.should_bind:
+            self.add_check_property("CanBind", "true")
+            self.add_command("bind")
+            self.add_check_property("Status", "Bound")
         return
 
     # ---------------------------------------------------------------------------
