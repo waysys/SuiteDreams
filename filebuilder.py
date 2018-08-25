@@ -196,6 +196,11 @@ class FileBuilder:
         """
         Place the initial rows into the table
         """
+        #
+        # Create the fixture row.
+        #
+        self.add_command(self.product_spec.fixture)
+        #
         # Create predefined rows
         #
         self.add_set_value("Test Id", self.test_id)
@@ -615,7 +620,7 @@ class FileBuilder:
             coverage_code - the code from the product model for the coverage
             coverable_name - the name of the coverable
         """
-        row = ["create", coverage_code, "on", coverable_name]
+        row = ["create", "coverage", coverage_code, "on", coverable_name]
         self.test_case.add_row(row)
         return
 

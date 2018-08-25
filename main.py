@@ -33,6 +33,8 @@ import traceback
 from suitedreamsexception import SuiteDreamsException
 from filebuilder import FileBuilder
 from pathlib import Path
+import time
+import math
 
 
 # -------------------------------------------------------------------------------
@@ -49,6 +51,7 @@ def main(product_spec_filename, test_suite_library):
         test_suite_library - the directory that holds test suites
     """
     print("Starting SuiteDreams")
+    prior = time.time()
     validate(product_spec_filename, test_suite_library)
     validate_test_suite_library(test_suite_library)
 
@@ -67,7 +70,9 @@ def main(product_spec_filename, test_suite_library):
         traceback.print_tb(tb)
         sys.exit(1)
     finally:
-        print("Ending SuiteDreams")
+        now = time.time()
+        duration = math.ceil(now - prior)
+        print("Ending SuiteDreams - " + str(duration) + " seconds")
     sys.exit(0)
 
 

@@ -26,6 +26,7 @@ import xml.etree.ElementTree as Et
 from pathlib import Path
 from suitedreamsexception import SuiteDreamsException
 
+
 # -------------------------------------------------------------------------------
 #  Product Spec class
 # -------------------------------------------------------------------------------
@@ -58,6 +59,7 @@ class ProductSpec:
         self._description = None
         self._seed = None
         self._product_name = None
+        self._fixture = None
         return
 
     # ---------------------------------------------------------------------------
@@ -132,6 +134,13 @@ class ProductSpec:
         if self._description is None:
             self._description = self.fetch_text(self._root, "Description")
         return self._description
+
+    @property
+    def fixture(self):
+        """Return the fixture to handle this test suite"""
+        if self._fixture is None:
+            self._fixture = self.fetch_text(self._root, "Fixture")
+        return self._fixture
 
     @property
     def root_element(self):
