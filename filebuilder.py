@@ -34,7 +34,8 @@ import random
 
 class FileBuilder:
     """
-    The File Builder class creates a single test case file in HTML format.
+    The File Builder class creates a single test case file in HTML format.  It is the
+    intermediate between the main module, the product specification, and the test case.
     """
 
     def __init__(self, product_spec, test_suite_library, num):
@@ -326,20 +327,19 @@ class FileBuilder:
         # Output the "select coverable" or "create coverable" row only if there are properties
         # to set.
         #
-        if len(property_elements) > 0:
-            if FileBuilder.is_coverable_created(coverable_element):
-                self.add_create_coverable(coverable_name)
-            else:
-                self.add_select_coverable(coverable_name)
-            #
-            #  Output set_select rows to set property values
-            #
-            for property_element in property_elements:
-                self.process_coverable_property(property_element)
-            #
-            # Output "commit coverable" row.
-            #
-            self.add_commit("coverable")
+        if FileBuilder.is_coverable_created(coverable_element):
+            self.add_create_coverable(coverable_name)
+        else:
+            self.add_select_coverable(coverable_name)
+        #
+        #  Output set_select rows to set property values
+        #
+        for property_element in property_elements:
+            self.process_coverable_property(property_element)
+        #
+        # Output "commit coverable" row.
+        #
+        self.add_commit("coverable")
         #
         # Output coverages
         #
