@@ -57,8 +57,6 @@ class FileBuilder:
         #
         # Set the seed for the random number generator
         #
-        seed = product_spec.seed
-        random.seed(seed)
         return
 
     # ---------------------------------------------------------------------------

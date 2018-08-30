@@ -35,6 +35,7 @@ from filebuilder import FileBuilder
 from pathlib import Path
 import time
 import math
+import random
 
 
 # -------------------------------------------------------------------------------
@@ -123,12 +124,29 @@ def process(product_spec_filename, test_suite_library):
         product_spec_filename - the product specification filename.
         test_suite_library - the path to the directory that will hold the test suite
     """
+    #
+    # Parse product product_spec
+    #
     product_spec = ProductSpec(product_spec_filename)
     product_spec.parse()
+    #
+    # Validate test suite directory
+    #
     suite_name = product_spec.suite_name
     validate_test_suite_dir(test_suite_library, suite_name)
+    #
+    # Initial random number seed
+    #
+    seed = product_spec.seed
+    random.seed(seed)
+    #
+    # Get count of test cases to produce
+    #
     count = product_spec.count
     print("SuiteDreams is producing " + str(count) + " test cases in test suite " + suite_name)
+    #
+    # Generate the test cases
+    #
     for num in range(count):
         print("Processing testcase " + str(num + 1))
         file_builder = FileBuilder(product_spec, test_suite_library, num + 1)
