@@ -245,10 +245,13 @@ class FileBuilder:
     # ---------------------------------------------------------------------------
 
     def process_product(self):
-        """Process the <Product> element """
+        """
+        Process the <Product> element
+        """
         product_element = self.product_spec.fetch_element(self.product_spec_root, "Product")
         self.process_question_sets(product_element)
         self.process_coverables(product_element)
+        self.process_scheduled_items(product_element)
 
     def process_question_sets(self, product_element):
         """
@@ -401,6 +404,36 @@ class FileBuilder:
         value = self.process_values(coverage_term_element, coverage_term_code, "Term")
         self.add_with(coverage_term_code, value)
         return
+
+    # ---------------------------------------------------------------------------
+    #  Operations for Scheduled Items
+    # ---------------------------------------------------------------------------
+
+    def process_scheduled_items(self, product_element):
+        """Process the scheduled item specifications
+
+        Argument:
+            product_element - the product element
+        """
+        scheduled_items_elements = self.product_spec.fetch_all_elements(product_element, "ScheduledItem")
+        for scheduled_item_element in scheduled_items_elements:
+            self.process_scheduled_item(scheduled_item_element)
+        return
+
+    def process_scheduled_item(self, scheduled_item_element):
+        """Process a scheduled item element and output the lines to the test case file.
+
+        Argument:
+            scheduled_item_element - element holding the scheduled item
+        """
+        selector = self.random_selector
+        if self.select_element(scheduled_item_element, selector):
+            coverage_code = self.product_spec.fetch_text(scheduled_item_element, "CoverageCode")
+            self.add_create_scheduled_item(coverage_code)
+            property_elements = self.product_spec.fetch_all_elements(scheduled_item_element, "Property")
+            for property_element in property_elements:
+                self.process_coverable_property(property_element)
+            self.add_commit("coverage")
 
     # ---------------------------------------------------------------------------
     #  Operations for Quote and Bind
@@ -631,5 +664,15 @@ class FileBuilder:
             value - the value for the term
         """
         row = ["with", coverage_term_code, "to", value]
+        self.test_case.add_row(row)
+        return
+
+    def add_create_scheduled_item(self, coverage_code):
+        """Add a line to create a scheduled item
+
+        Argument:
+            coverage_code - the code for the coverage on which the scheduled item is attached
+        """
+        row = ["create", "scheduled item", coverage_code]
         self.test_case.add_row(row)
         return
