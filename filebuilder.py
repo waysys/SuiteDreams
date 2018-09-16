@@ -433,7 +433,7 @@ class FileBuilder:
             property_elements = self.product_spec.fetch_all_elements(scheduled_item_element, "Property")
             for property_element in property_elements:
                 self.process_coverable_property(property_element)
-            self.add_commit("coverage")
+            self.add_commit("scheduled item")
 
     # ---------------------------------------------------------------------------
     #  Operations for Quote and Bind
