@@ -638,7 +638,7 @@ class FileBuilder:
         Arguments:
             entity - either coverable or coverage
         """
-        assert entity in ["coverable", "coverage"]
+        assert entity in ["coverable", "coverage", "scheduled item"]
         row = ["commit", entity]
         self.test_case.add_row(row)
         return
