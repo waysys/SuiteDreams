@@ -179,6 +179,13 @@ class ProductSpec:
         return has_quote_element or has_bind_element
 
     @property
+    def quote_element(self):
+        """Return the Quote element"""
+        product_element = self.fetch_element(self.root_element, "Policy")
+        quote_element = ProductSpec.fetch_element(product_element, "Quote")
+        return quote_element
+
+    @property
     def should_bind(self):
         """
         Return True if the submission should be bound.

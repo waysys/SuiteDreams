@@ -447,6 +447,13 @@ class FileBuilder:
             self.add_check_property("CanRequestQuote", "true")
             self.add_command("quote")
             self.add_check_property("Status", "Quoted")
+            #
+            #  Add properties that should follow the quote
+            #
+            quote_element = self.product_spec.quote_element
+            property_elements = self.product_spec.fetch_all_elements(quote_element, "Property")
+            for property_element in property_elements:
+                self.process_property(property_element)
         return
 
     def process_bind(self):
@@ -457,6 +464,7 @@ class FileBuilder:
             self.add_check_property("CanBind", "true")
             self.add_command("bind")
             self.add_check_property("Status", "Bound")
+            self.add_check_property("Policy Number", " ")
         return
 
     # ---------------------------------------------------------------------------
