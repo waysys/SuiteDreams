@@ -252,6 +252,7 @@ class FileBuilder:
         self.process_question_sets(product_element)
         self.process_coverables(product_element)
         self.process_scheduled_items(product_element)
+        self.process_umbrella(product_element)
 
     def process_question_sets(self, product_element):
         """
@@ -434,6 +435,57 @@ class FileBuilder:
             for property_element in property_elements:
                 self.process_coverable_property(property_element)
             self.add_commit("scheduled item")
+
+    # ---------------------------------------------------------------------------
+    #  Operations for Umbrella
+    # ---------------------------------------------------------------------------
+
+    def process_umbrella(self, product_element):
+        """Generate rows for the umbrealla coverage
+
+        Argument:
+            product_element = the product element
+        """
+        if self.product_spec.has_element(product_element, "Umbrella"):
+            umbrella_element = self.product_spec.fetch_element(product_element, "Umbrella")
+            selector = self.random_selector
+            if self.select_element(umbrella_element, selector):
+                limit = self.process_umbrella_limit(umbrella_element)
+                self.process_umbrella_entity(umbrella_element, limit, "Exposure")
+                self.process_umbrella_entity(umbrella_element, limit, "Question")
+                self.process_umbrella_entity(umbrella_element, limit, "Policy")
+                self.process_umbrella_entity(umbrella_element, limit, "Member")
+                self.process_umbrella_entity(umbrella_element, limit, "Driver")
+        return
+
+    def process_umbrella_limit(self, umbrella_element):
+        """Fetch the limit value and return it.
+
+        Argument:
+            umbreall_element - the umbrella element
+        """
+        limit_element = self.product_spec.fetch_element(umbrella_element, "Limit")
+        limit = self.process_values(limit_element, "Umbrella", "Value")
+        return limit
+
+    def process_umbrella_entity(self, umbrella_element, limit, entity_type):
+        """If it exists, process the Exposure element.
+
+        Arguments:
+            umbrella_element - the Umbrella element
+            limit - the umbrella limit
+            entity_type - the type of entity being processed: exposure, question, policy, member, driver
+        """
+        if self.product_spec.has_element(umbrella_element, entity_type):
+            #
+            # Fetch the exposure element and issue the create umbreall exposure row
+            exposure_element = self.product_spec.fetch_element(umbrella_element, entity_type)
+            self.add_create_umbrella(entity_type.lower(), limit)
+            property_elements = self.product_spec.fetch_all_elements(exposure_element, "Property")
+            for property_element in property_elements:
+                self.process_coverable_property(property_element)
+            self.add_commit("umbrella")
+        return
 
     # ---------------------------------------------------------------------------
     #  Operations for Quote and Bind
@@ -646,7 +698,7 @@ class FileBuilder:
         Arguments:
             entity - either coverable or coverage
         """
-        assert entity in ["coverable", "coverage", "scheduled item"]
+        assert entity in ["coverable", "coverage", "scheduled item", "umbrella"], "Invalid commit entity - " + entity
         row = ["commit", entity]
         self.test_case.add_row(row)
         return
@@ -682,5 +734,22 @@ class FileBuilder:
             coverage_code - the code for the coverage on which the scheduled item is attached
         """
         row = ["create", "scheduled item", coverage_code]
+        self.test_case.add_row(row)
+        return
+
+    def add_create_umbrella(self, entity_type, limit):
+        """
+        Add a line for:
+
+        create umbrella <entity_type> with <limit>
+
+        Arguments:
+            entity_type - one of: exposure, question, member, driver
+            limit - the limit for the umbrella coverage
+        """
+        values = ["exposure", "question", "member", "driver", "policy"]
+        if entity_type not in values:
+            raise SuiteDreamsException("Umbrella entity type is invalid -" + entity_type)
+        row = ["create", "umbrella", entity_type, "with", limit]
         self.test_case.add_row(row)
         return
