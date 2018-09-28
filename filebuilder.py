@@ -251,7 +251,6 @@ class FileBuilder:
         product_element = self.product_spec.fetch_element(self.product_spec_root, "Product")
         self.process_question_sets(product_element)
         self.process_coverables(product_element)
-        self.process_scheduled_items(product_element)
         self.process_umbrella(product_element)
 
     def process_question_sets(self, product_element):
@@ -348,6 +347,10 @@ class FileBuilder:
         coverage_elements = self.product_spec.fetch_all_elements(coverable_element, "Coverage")
         for coverage_element in coverage_elements:
             self.process_coverage(coverage_element, coverable_name)
+        #
+        # Output scheduled items
+        #
+        self.process_scheduled_items(coverable_element, coverable_name)
         return
 
     def process_coverable_property(self, property_element):
@@ -410,27 +413,29 @@ class FileBuilder:
     #  Operations for Scheduled Items
     # ---------------------------------------------------------------------------
 
-    def process_scheduled_items(self, product_element):
+    def process_scheduled_items(self, coverable_element, coverable_name):
         """Process the scheduled item specifications
 
         Argument:
-            product_element - the product element
+            coverable_element - the coverable element containing the scheduled item
+            coverable_name - the name of the coverable, for exampleL policy line, dwelling, home business n
         """
-        scheduled_items_elements = self.product_spec.fetch_all_elements(product_element, "ScheduledItem")
+        scheduled_items_elements = self.product_spec.fetch_all_elements(coverable_element, "ScheduledItem")
         for scheduled_item_element in scheduled_items_elements:
-            self.process_scheduled_item(scheduled_item_element)
+            self.process_scheduled_item(scheduled_item_element, coverable_name)
         return
 
-    def process_scheduled_item(self, scheduled_item_element):
+    def process_scheduled_item(self, scheduled_item_element, coverable_name):
         """Process a scheduled item element and output the lines to the test case file.
 
         Argument:
             scheduled_item_element - element holding the scheduled item
+            coverable_name - the name of the coverable, for exampleL policy line, dwelling, home business n
         """
         selector = self.random_selector
         if self.select_element(scheduled_item_element, selector):
             coverage_code = self.product_spec.fetch_text(scheduled_item_element, "CoverageCode")
-            self.add_create_scheduled_item(coverage_code)
+            self.add_create_scheduled_item(coverage_code, coverable_name)
             property_elements = self.product_spec.fetch_all_elements(scheduled_item_element, "Property")
             for property_element in property_elements:
                 self.process_coverable_property(property_element)
@@ -586,7 +591,7 @@ class FileBuilder:
     @staticmethod
     def is_coverable_created(coverage_element):
         """Return true if the coverage is to be created"""
-        select = coverage_element.get("select")
+        select = coverage_element.get("selection")
         if select is None:
             result = False
         elif select == "create":
@@ -727,13 +732,14 @@ class FileBuilder:
         self.test_case.add_row(row)
         return
 
-    def add_create_scheduled_item(self, coverage_code):
+    def add_create_scheduled_item(self, coverage_code, coverable_name):
         """Add a line to create a scheduled item
 
         Argument:
             coverage_code - the code for the coverage on which the scheduled item is attached
+            coverable_name - the name of the coverable.
         """
-        row = ["create", "scheduled item", coverage_code]
+        row = ["create", "scheduled item", coverage_code, "on", coverable_name]
         self.test_case.add_row(row)
         return
 
