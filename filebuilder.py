@@ -440,6 +440,13 @@ class FileBuilder:
             for property_element in property_elements:
                 self.process_coverable_property(property_element)
             self.add_commit("scheduled item")
+            #
+            # Process coverages dependent on this scheduled item
+            #
+            coverage_elements = self.product_spec.fetch_all_elements(scheduled_item_element, "Coverage")
+            for coverage_element in coverage_elements:
+                self.process_coverage(coverage_element, coverable_name)
+        return
 
     # ---------------------------------------------------------------------------
     #  Operations for Umbrella
