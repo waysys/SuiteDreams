@@ -351,6 +351,10 @@ class FileBuilder:
         # Output scheduled items
         #
         self.process_scheduled_items(coverable_element, coverable_name)
+        #
+        # Validate that no separate coverage is the same as the coverage for a scheduled item.
+        #
+        self.validate_coverages(coverable_element, coverable_name)
         return
 
     def process_coverable_property(self, property_element):
@@ -366,6 +370,64 @@ class FileBuilder:
             """Property is selected.  Generate the value for the property."""
             value = self.process_values(property_element, property_name, "Value")
             self.add_set_select_value(property_name, value)
+        return
+
+    def validate_coverages(self, coverable_element, coverable_name):
+        """
+        Verify that:
+          no coverage is also a scheduled item
+          -- no coverage is listed twice
+          -- provide a count of unique coverages and scheduled items
+
+        Note: Scheduled items with the same coverage can appear multiple times
+
+        Arguments:
+            coverable_element - the coverable element that contains the coverages and scheduled items
+            coverable_name - the coverable name
+        """
+        coverages = set()
+        scheduled_items = set()
+        #
+        # Collect the coverages associated with scheduled items
+        #
+        scheduled_item_elements = self.product_spec.fetch_all_elements(coverable_element, "ScheduledItem")
+        for scheduled_item_element in scheduled_item_elements:
+            coverage_code = self.product_spec.fetch_text(scheduled_item_element, "CoverageCode")
+            scheduled_items.add(coverage_code)
+            #
+            # Collect the coverages at the scheduled item level
+            #
+            coverage_elements = self.product_spec.fetch_all_elements(scheduled_item_element, "Coverage")
+            for coverage_element in coverage_elements:
+                coverage_code1 = self.product_spec.fetch_text(coverage_element, "CoverageCode")
+                if coverage_code1 in coverages:
+                    message = "Duplicate coverage " + coverage_code1
+                    message += " in scheduled item " + coverage_code + " in coverable " + coverable_name
+                    print(message)
+                else:
+                    coverages.add(coverage_code1)
+        #
+        # Check that coverages collected from scheduled items are not also schedule item coveerages.
+        #
+        for coverage in coverages:
+            if coverage in scheduled_items:
+                print("Coverage " + coverage + " is also a scheduled item coverage in coverable " + coverable_name)
+        #
+        # Collect the coverages associated with coverages at the coverable level
+        #
+        coverage_elements = self.product_spec.fetch_all_elements(coverable_element, "Coverage")
+        for coverage_element in coverage_elements:
+            coverage_code = self.product_spec.fetch_text(coverage_element, "CoverageCode")
+            if coverage_code in scheduled_items:
+                print("Coverage " + coverage_code + " is also a scheduled item coverage in coverable " + coverable_name)
+            elif coverage_code in coverages:
+                print("Coverage " + coverage_code + " is a duplicate in coverable " + coverable_name)
+            else:
+                coverages.add(coverage_code)
+        print("Coverage count for coverage " + coverable_name)
+        print("\n   scheduled_items: " + str(len(scheduled_items)))
+        print("   coverages: " + str(len(coverages)))
+        print("\n")
         return
 
     # ---------------------------------------------------------------------------
@@ -490,7 +552,7 @@ class FileBuilder:
         """
         if self.product_spec.has_element(umbrella_element, entity_type):
             #
-            # Fetch the exposure element and issue the create umbreall exposure row
+            # Fetch the exposure element and issue the create umbrella exposure row
             exposure_element = self.product_spec.fetch_element(umbrella_element, entity_type)
             self.add_create_umbrella(entity_type.lower(), limit)
             property_elements = self.product_spec.fetch_all_elements(exposure_element, "Property")
