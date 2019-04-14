@@ -169,8 +169,9 @@ def validate_test_suite_dir(test_suite_library, suite_name):
     test_suite_dir = test_suite_library + "/" + suite_name
     path = Path(test_suite_dir)
     if path.exists():
-        raise SuiteDreamsException("Test suite directory already exists - " + test_suite_dir)
-    path.mkdir(mode=0o777, parents=False, exist_ok=False)
+        print("Test suite directory already exists - " + test_suite_dir)
+    else:
+        path.mkdir(mode=0o777, parents=False, exist_ok=False)
     return
 
 # ---------------------------------------------------------------------------

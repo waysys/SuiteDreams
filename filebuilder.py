@@ -424,10 +424,6 @@ class FileBuilder:
                 print("Coverage " + coverage_code + " is a duplicate in coverable " + coverable_name)
             else:
                 coverages.add(coverage_code)
-        print("Coverage count for coverage " + coverable_name)
-        print("\n   scheduled_items: " + str(len(scheduled_items)))
-        print("   coverages: " + str(len(coverages)))
-        print("\n")
         return
 
     # ---------------------------------------------------------------------------
