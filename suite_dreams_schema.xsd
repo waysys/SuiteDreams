@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2017 rel. 3 (x64) (http://www.altova.com) by William A Shaffer (Waysys LLC) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xs:element name="TestSuite" type="TypeTestSuite">
+		<xs:annotation>
+			<xs:documentation>This element is the root of the test suite specification.</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="TypeTestSuite">
+		<xs:annotation>
+			<xs:documentation>
+	This type defines the top level structure of test suite specification.  This schema supports the GFIT2020 version.
+	</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="SuiteName" type="xs:string"/>
+			<xs:element name="SuiteId" type="xs:string"/>
+			<xs:element name="Author" type="xs:string"/>
+			<xs:element name="Description" type="xs:string"/>
+			<xs:element name="ProjectName" type="xs:string"/>
+			<xs:element name="Version" type="xs:string"/>
+			<xs:element name="Fixtures" >
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Fixture" type="TypeFixture" minOccurs="1" maxOccurs="unbounded"></xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Count">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Seed">
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="Product" type="TypeProduct">
+				<xs:annotation>
+					<xs:documentation>
+			The product element contains the definition of the product.
+			</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Policy" type="TypePolicy">
+				<xs:annotation>
+					<xs:documentation>
+			The policy element contains properties to be set on the policy.
+			</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeProduct">
+		<xs:annotation>
+			<xs:documentation>The product element describes the product being tested.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="ProductCode" type="xs:string"/>
+			<xs:element name="QuestionSet" type="TypeQuestionSet" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Coverable" type="TypeCoverable" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Umbrella" type="TypeUmbrella" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeScheduledItem">
+		<xs:annotation>
+			<xs:documentation>
+The scheduled item element specifies the coverage for the scheduled items and the properties that the scheduled item will have.	
+	</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="CoverageCode" type="xs:string"/>
+			<xs:element name="Property" type="TypeProperty" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Coverage" type="TypeCoverage" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute ref="weight" use="optional" default="100"/>
+	</xs:complexType>
+	<xs:complexType name="TypeUmbrella">
+		<xs:annotation>
+			<xs:documentation>
+	The Umbrella elements provides for the specification of a personal umbrella coverage.
+	</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Limit" type="TypeLimit" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="Exposure" type="TypeMultipleProperties" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Question" type="TypeMultipleProperties" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Policy" type="TypeMultipleProperties" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Member" type="TypeMultipleProperties" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Driver" type="TypeMultipleProperties" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute ref="weight" use="optional" default="100"/>
+	</xs:complexType>
+	<xs:complexType name="TypeMultipleProperties">
+		<xs:sequence>
+			<xs:element name="Property" type="TypeProperty" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypePolicy">
+		<xs:annotation>
+			<xs:documentation>The policy element provides the information for defining the policy</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Property" type="TypeProperty" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element name="Quote" type="TypeQuote" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Bind" type="TypeEmpty" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeLimit">
+		<xs:sequence>
+			<xs:element name="Value" type="TypeValue" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeQuote">
+		<xs:annotation>
+			<xs:documentation>
+The Quote elements indicates that the submission should be quoted.  The element allows
+the specification of properties which will be set prior to initiating the quote.	
+	</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Property" type="TypeProperty" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeEmpty">
+		<xs:annotation>
+			<xs:documentation>
+	This type supports empty tags for Bind.
+	</xs:documentation>
+		</xs:annotation>
+	</xs:complexType>
+	<xs:complexType name="TypeQuestionSet">
+		<xs:annotation>
+			<xs:documentation>The question element defines a question set</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="QuestionSetCode" type="xs:string"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Question" type="TypeQuestion" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeQuestion">
+		<xs:annotation>
+			<xs:documentation>The question element identifies a question and a set of valid answers</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="QuestionCode" type="xs:string"/>
+			<xs:element name="Answer" type="TypeValue" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeValue">
+		<xs:annotation>
+			<xs:documentation>
+	The value type element stores a value of a property.  A property can have multiple values, each with a
+	weight to determine which one is chosen for the test case.
+	</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute ref="weight" use="optional" default="100"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="TypeProperty">
+		<xs:annotation>
+			<xs:documentation>
+		The Property element represents the action of setting the value of a property on a fixture or entity.
+		</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="PropertyName" type="xs:string"/>
+			<xs:element name="Value" type="TypeValue" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute ref="weight" use="optional" default="100"/>
+		<xs:attribute name="class" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="unique"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="TypeCoverable">
+		<xs:annotation>
+			<xs:documentation>
+		A coverable is an entity that has properties and coverages.
+		</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CoverableName" type="xs:string"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="Property" type="TypeProperty" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Coverage" type="TypeCoverage" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="ScheduledItem" type="TypeScheduledItem" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute ref="weight" use="optional" default="100"/>
+		<xs:attribute name="selection">
+			<xs:annotation>
+				<xs:documentation>
+		Attribute selection specifies whether the coverable is selected or created.  Coverables being
+		selected exist on the policy by default.  Coverables that are being created are optional and are
+		not present on the policy by default.
+		</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="create"/>
+					<xs:enumeration value="select"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="minCount">
+			<xs:annotation>
+				<xs:documentation>
+		Attribute minCount specifies the minimum number of this coverable to be created.  The attribute
+		is meaningful only if the coverable is being created.  If count is the number of coverables,
+		count is a random number such that count is between minCount and maxCount.
+		</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="1000"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="maxCount">
+			<xs:annotation>
+				<xs:documentation>
+		Attribute maxCount specifies the maximum number of this coverable to be created.  The attribute
+		is meaningful only if the coverable is being created.  
+		MinCount must be less than or equal to maxCount.
+		</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="1000"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+	<xs:complexType name="TypeCoverage">
+		<xs:annotation>
+			<xs:documentation>
+	A coverage is the amount of risk or protection provided by the insurer for an entity.
+	</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CoverageCode" type="xs:string"/>
+			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="CoverageTerm" type="TypeCoverageTerm" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute ref="weight"/>
+	</xs:complexType>
+	<xs:complexType name="TypeCoverageTerm">
+		<xs:annotation>
+			<xs:documentation>
+	A coverage term is a limit or deductible or other attribute of a coverage.
+	</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="CoverageTermCode"/>
+			<xs:element name="Term" type="TypeValue" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TypeFixture" >
+		<xs:annotation>
+			<xs:documentation>The fixture element specifies the GFIT fixture used for a particular role.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Role"></xs:element>
+			<xs:element name="FixtureClass"></xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:attribute name="weight">
+		<xs:simpleType>
+			<xs:annotation>
+				<xs:documentation>
+		The weight attribute controls the probility of a feature being selected 
+		for inclusion in the test case.  
+		The weight is an integer between 0 and 100 inclusive.  
+		If the weight is 0, the feature is guaranteed 
+		to not be included.  If the weight is 100, the feature is guaranteed to be included.  For integers
+		in between, a random selector between 1 and 100 is generated, if the selector is less than or 
+		equal to the weight, the feature is selected.
+	</xs:documentation>
+			</xs:annotation>
+			<xs:restriction base="xs:integer">
+				<xs:minInclusive value="0"/>
+				<xs:maxInclusive value="1000"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+</xs:schema>
