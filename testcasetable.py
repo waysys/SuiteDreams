@@ -917,12 +917,12 @@ class CreateCoveragesTestTable(ActionTestTable):
         #
         # Create the coverage
         #
-        coverage_code = self.product_spec.fetch_text(coverage_element, "CoverageCode")
+        coverage_code = self.product_spec.fetch_coverage_code(coverage_element)
         self.create_coverage(coverage_code)
         #
         # Add the coverage terms
         #
-        cov_term_elements = self.product_spec.fetch_coverage_terms(coverage_element, "CoverageTerm")
+        cov_term_elements = self.product_spec.fetch_coverage_terms(coverage_element)
         for cov_term_element in cov_term_elements:
             self.process_coverage_term(cov_term_element)
         return

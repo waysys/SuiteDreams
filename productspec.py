@@ -551,7 +551,7 @@ class ProductSpec(SchemaHandler):
     #  Domain Operations
     # --------------------------------------------------------------------------
 
-    def fetch_questions_sets(self):
+    def fetch_question_sets(self):
         """
         Return a list of question set elements.
         """
@@ -588,7 +588,7 @@ class ProductSpec(SchemaHandler):
             question_element - the element containing the answers
         """
         question_code = self.fetch_text(question_element, "QuestionCode")
-        answer = self.process_values(question_element, "Question", "Answer")
+        answer = self.process_values(question_element, "Question", "Answer", self.random_selector)
         return (question_code, answer)
 
     def fetch_coverables(self):
@@ -609,6 +609,16 @@ class ProductSpec(SchemaHandler):
         """
         coverage_elements = self.fetch_selected_elements(coverable_element, "Coverage")
         return coverage_elements
+
+    def fetch_coverage_code(self, coverage_element):
+        """
+        Return the code for thie coverage described in the coverage element.
+
+        Arguments:
+            coverage_element - the element for the coverage
+        """
+        coverage_code = self.fetch_text(coverage_element, "CoverageCode")
+        return coverage_code
 
     def fetch_coverage_terms(self, coverage_element):
         """
