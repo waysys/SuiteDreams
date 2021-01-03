@@ -752,7 +752,7 @@ class ActionTestTable(TestTable):
         Create a row 'select submission submission_id'
         """
         row = [
-            "set",
+            "select",
             "submission",
             self.submission_id
         ]
