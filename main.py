@@ -16,7 +16,7 @@
 # -------------------------------------------------------------------------------
 
 __author__ = 'Bill Shaffer'
-__version__ = "1.00"
+__version__ = "2.00"
 
 """
 SuiteDreams is a test case generation tool that supports the creation of HTML
@@ -118,7 +118,7 @@ def validate_test_suite_library(test_suite_library):
 
 def process(product_spec_filename, test_suite_library):
     """
-    Read the product spec and geneerate the number of test cases specified.
+    Read the product spec and generate the number of test cases specified.
 
     Arguments:
         product_spec_filename - the product specification filename.
@@ -160,7 +160,7 @@ def validate_test_suite_dir(test_suite_library, suite_name):
     Then create it.
 
     Arguments:
-         test_suite_library - the diretory that holds test suites.
+         test_suite_library - the directory that holds test suites.
          suite_name - the name of the test suite.  This will be the name of the subdirectory in
             the test suite library
     """

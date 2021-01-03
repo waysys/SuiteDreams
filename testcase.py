@@ -16,17 +16,19 @@
 # -------------------------------------------------------------------------------
 
 __author__ = 'Bill Shaffer'
-__version__ = "1.00"
+__version__ = "31-Dec-2020"
+
 
 """
 The test case module contains the TestCase class.
 """
 
+from xml.dom import minidom
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import tostring
-from suitedreamsexception import SuiteDreamsException
-from xml.dom import minidom
 from _datetime import date
+
+from testcasetable import create_test_tables
 
 
 # -------------------------------------------------------------------------------
@@ -36,29 +38,31 @@ from _datetime import date
 
 class TestCase:
     """
-    The TestCase class models an HTML file used for GFIT test cases.
+    The TestCase class models an HTML elements used for GFIT test cases.
+    The class creates the descriptive information at the beginning of the
+    test case and calls a function in the testcasetable module to create
+    the specific tables for this test case..
     """
 
     # ---------------------------------------------------------------------------
     #  Constructor
     # ---------------------------------------------------------------------------
 
-    def __init__(self, filename):
+    def __init__(self, product_spec, test_case_number):
         """
         Initialize the class.
 
         Argument:
             filename - the name of the file to be created.
         """
-        assert filename is not None, "TestCase: File name must not be None"
-        assert len(filename) > 0, "TestCase: File name must not be an empty string"
-        self._filename = filename
+        assert product_spec is not None, "Product specification must not be None"
         self._html = None
-        self._title = "Test Case"
-        self._project = "My Project"
-        self._author = "Tester"
-        self._description = "Test case description"
-        self._table = None
+        self._product_spec = product_spec
+        self._title = self.product_spec.suite_name
+        self._project = self.product_spec.project
+        self._author = self.product_spec.author
+        self._description = self.product_spec.description
+        self._test_case_number = test_case_number
         return
 
     # ---------------------------------------------------------------------------
@@ -71,87 +75,46 @@ class TestCase:
         This property holds the content that goes into the <title> element in
         the heading.
         """
+        assert self._title is not None, "Title must not be None"
         return self._title
-
-    @title.setter
-    def title(self, content):
-        """
-        Set the value of the title.
-
-        Argument:
-            content - the title of the test page
-        """
-        if content is None:
-            message = "Title of test case must not be None"
-            raise SuiteDreamsException(message)
-        if len(content) == 0:
-            message = "Title of test case must not be empty"
-            raise SuiteDreamsException(message)
-        self._title = content
-        return
 
     @property
     def project(self):
         """
         Return the name of the project.
         """
+        assert self._project is not None, "Project must not be None"
         return self._project
-
-    @project.setter
-    def project(self, name):
-        """
-        Set the name of the project.
-
-        Argument:
-            name - the name of the project
-        """
-        assert name is not None, "project: Project name must not be null"
-        assert len(name) > 0, "project: Project name must not be an empty string."
-        self._project = name
-        return
 
     @property
     def author(self):
         """
         Return the author of this test case.
         """
+        assert self._author is not None, "Author must not be None"
         return self._author
-
-    @author.setter
-    def author(self, name):
-        """
-        Set the name of the author.
-
-        Argument:
-            name - the name of the author
-        """
-        assert name is not None, "author: Author must not be None"
-        assert len(name) > 0, "author: Author must not be an empty string"
-        self._author = name
-        return
 
     @property
     def description(self):
         """
         Return a description of the test case.
         """
+        assert self._description is not None, "Description must not be None"
         return self._description
 
-    @description.setter
-    def description(self, desc):
+    @property
+    def product_spec(self):
+        """Return the parsed XML product specification.
         """
-        Set the description for the project.
-        """
-        assert desc is not None, "description: description must not be null"
-        self._description = desc
-        return
+        assert self._product_spec is not None, "Product specification has not been set"
+        return self._product_spec
 
     @property
-    def table(self):
+    def test_case_number(self):
         """
-        Return the table element where the rows go.
+        The four digit number associated with the test case being created.
         """
-        return self._table
+        return self._test_case_number
 
     # ---------------------------------------------------------------------------
     #  Element Creation Operations
@@ -166,8 +129,8 @@ class TestCase:
         root.append(head)
         body = self.create_body()
         root.append(body)
-        self._html = root
-        return
+        self._html = self.prettify(root)
+        return self._html
 
     @staticmethod
     def create_html():
@@ -225,21 +188,20 @@ class TestCase:
         """
         Create the body element
         """
+        #
+        # Create test case description
+        #
         body = Element("body")
         test_description = self.create_test_description()
         body.append(test_description)
         hr = Element("hr")
         body.append(hr)
-        h2 = Element("h2")
-        h2.text = self.title
-        body.append(h2)
-        table = self.create_table()
-        body.append(table)
+        create_test_tables(body, self.product_spec, self.test_case_number)
         return body
 
     def create_test_description(self):
         """
-        Create a descripton list element with information about the test case.
+        Create a description list element with information about the test case.
         """
         dl = Element("dl")
         TestCase.create_dl_dt(dl, "Project:", self.project)
@@ -268,52 +230,6 @@ class TestCase:
         dl.append(dd)
         return
 
-    def create_table(self):
-        """Create a table element"""
-        attrib = {"border": "1"}
-        table = Element("table", attrib)
-        self._table = table
-        return table
-
-    def add_row(self, values):
-        """
-        Add a row to the table in the test case.
-
-        Argument:
-            values - a list of between 1 and 5 strings for the content of the row
-        """
-        assert values is not None
-        assert len(values) > 0, "add_row: there must be at least one value in a row"
-        assert len(values) < 6, "add_row: there must be no more than 5 values in a row"
-        tr = Element("tr")
-        for value in values:
-            td = Element("td")
-            td.text = value
-            tr.append(td)
-        self.table.append(tr)
-        return
-
-    def add_row_attrib(self, values, attrib):
-        """
-        Add a row to the table and place attributes on the first cell in the row.
-
-        Arguments:
-            values - a list of between 1 and 5 strings for the content of the row.
-            attrib - a dictionary with attributes on the first
-        """
-        assert values is not None
-        assert len(values) > 0, "add_row_attrib: there must be at least one value in a row"
-        assert len(values) < 6, "add_row_attrib: there must be no more than 5 values in a row"
-        tr = Element("tr")
-        td = Element("td", attrib)
-        td.text = values.pop(0)
-        tr.append(td)
-        for value in values:
-            td = Element("td")
-            td.text = value
-            tr.append(td)
-        self.table.append(tr)
-
     # ---------------------------------------------------------------------------
     #  Output Operations
     # ---------------------------------------------------------------------------
@@ -332,20 +248,4 @@ class TestCase:
         Output the file to standard out.
         """
         print(TestCase.prettify(self._html))
-        return
-
-    def output(self):
-        """
-        Output the HTML to its file.
-        """
-        file = None
-        try:
-            file = open(self._filename, 'w')
-            result = TestCase.prettify(self._html)
-            file.write(result)
-        except Exception as e:
-            raise SuiteDreamsException(e)
-        finally:
-            if file is not None:
-                file.close()
         return

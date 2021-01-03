@@ -19,10 +19,10 @@
 			<xs:element name="Description" type="xs:string"/>
 			<xs:element name="ProjectName" type="xs:string"/>
 			<xs:element name="Version" type="xs:string"/>
-			<xs:element name="Fixtures" >
+			<xs:element name="Fixtures">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="Fixture" type="TypeFixture" minOccurs="1" maxOccurs="unbounded"></xs:element>
+						<xs:element name="Fixture" type="TypeFixture" minOccurs="1" maxOccurs="unbounded"/>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -256,6 +256,8 @@ the specification of properties which will be set prior to initiating the quote.
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="CoverageCode" type="xs:string"/>
+			<xs:element name="PatternID" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="CoverageName" type="xs:string"/>
 			<xs:element name="Description" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="CoverageTerm" type="TypeCoverageTerm" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
@@ -272,13 +274,22 @@ the specification of properties which will be set prior to initiating the quote.
 			<xs:element name="Term" type="TypeValue" minOccurs="1" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="TypeFixture" >
+	<xs:complexType name="TypeFixture">
 		<xs:annotation>
 			<xs:documentation>The fixture element specifies the GFIT fixture used for a particular role.</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="Role"></xs:element>
-			<xs:element name="FixtureClass"></xs:element>
+			<xs:element name="Role">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="CreateSubmission"></xs:enumeration>
+					<xs:enumeration value="AnswerQuestions"></xs:enumeration>
+					<xs:enumeration value="UpdateDwelling"></xs:enumeration>
+					<xs:enumeration value="CreateCoverages"></xs:enumeration>
+				</xs:restriction>
+			</xs:simpleType>
+			</xs:element>
+			<xs:element name="FixtureClass"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:attribute name="weight">
