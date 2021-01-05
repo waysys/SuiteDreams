@@ -42,26 +42,16 @@ def create_test_tables(body, product_spec, test_case_number):
         product_spec - the product specification table
         test_case_number - the test case number
     """
-    #
-    # Add "create submission" test table
-    #
-    table = CreateSubmissionTestTable(body, product_spec, test_case_number)
-    format_test_table(body, table)
-    #
-    # Add "answer questions" test table
-    #
-    table = AnswerQuestionsTestTable(body, product_spec, test_case_number)
-    format_test_table(body, table)
-    #
-    # Add "update dwelling" test table
-    #
-    table = UpdateDwellingTestTable(body, product_spec, test_case_number)
-    format_test_table(body, table)
-    #
-    # Add "create coverage" test table.
-    #
-    table = CreateCoveragesTestTable(body, product_spec, test_case_number)
-    format_test_table(body, table)
+    tables = [
+        CreateSubmissionTestTable(body, product_spec, test_case_number),
+        AnswerQuestionsTestTable(body, product_spec, test_case_number),
+        UpdateDwellingTestTable(body, product_spec, test_case_number),
+        CreateCoveragesTestTable(body, product_spec, test_case_number),
+        QuiteIssueTestTable(body, product_spec, test_case_number)
+    ]
+
+    for table in tables:
+        format_test_table(body, table)
     return
 
 
@@ -326,6 +316,7 @@ class TestTable:
         row = [self.fixture]
         self.add_row(row, None)
         return
+
 
 # -------------------------------------------------------------------------------
 #  Column fixture test table
@@ -692,6 +683,70 @@ class UpdateDwellingTestTable(ColumnTestTable):
         self.add_row(row, None)
         return
 
+
+# -------------------------------------------------------------------------------
+#  Quote and Issue Test Table
+# -------------------------------------------------------------------------------
+
+
+class QuiteIssueTestTable(ColumnTestTable):
+
+    # ---------------------------------------------------------------------------
+    #  Constructor
+    # ---------------------------------------------------------------------------
+
+    def __init__(self, body, product_spec, test_case_number):
+        """
+        Initialize this instance of this class.
+        """
+        super().__init__(body, product_spec, test_case_number)
+        self.title = "Quote and Issue"
+        self.role = "QuoteIssue"
+        self.role_abbreviation = "QI"
+        self.fixture = product_spec.fetch_fixture(self.role)
+        assert self.fixture is not None, "Unable to retrieve fixture for role: " + self.role
+        self.headings = [
+            "TestId",
+            "Submission ID",
+            "Quote"
+        ]
+        self.is_unique = [
+            False,
+            True,
+            False
+        ]
+        return
+
+    # ---------------------------------------------------------------------------
+    #  Properties
+    # ---------------------------------------------------------------------------
+
+    # ---------------------------------------------------------------------------
+    #  Operations
+    # ---------------------------------------------------------------------------
+
+    def create_test_table(self):
+        """
+        Create the table html for the create submission table.
+        """
+        self.create_table()
+        self.add_fixture()
+        self.add_row(self.headings, self.is_unique)
+        self.create_row()
+        return self.table
+
+    def create_row(self):
+        """
+        Create the rows in the table
+        """
+        row = [
+            self.test_id,
+            self.submission_id,
+            "true"
+        ]
+        self.add_row(row, None)
+        return
+
 # -------------------------------------------------------------------------------
 #  Action fixture test table
 # -------------------------------------------------------------------------------
@@ -737,10 +792,12 @@ class ActionTestTable(TestTable):
         row = [
             "set",
             property_name,
-            property_value
+            property_value,
+            ""
         ]
         is_unique = [
             unique,
+            False,
             False,
             False
         ]
@@ -754,10 +811,12 @@ class ActionTestTable(TestTable):
         row = [
             "select",
             "submission",
-            self.submission_id
+            self.submission_id,
+            ""
         ]
         is_unique = [
             True,
+            False,
             False,
             False
         ]
@@ -776,23 +835,26 @@ class ActionTestTable(TestTable):
         row = [
             "select",
             "coverable",
-            coverable_name
+            coverable_name,
+            ""
         ]
         self.add_row(row, None)
         return
 
-    def create_coverage(self, coverage_code):
+    def create_coverage(self, coverage_code, coverage_count):
         """
         Create a row to create the coverage.
 
         Arguments:
             coverage_code - the code identifier for the coverage
+            coverage_count - the number of this coverage in the table.
         """
         assert coverage_code is not None, "Coverage name must not be None"
         assert len(coverage_code) > 0, "Coverage name must not be empty"
         row = [
             "create",
             "coverage",
+            self.test_id + "-" + str(coverage_count),
             coverage_code
         ]
         self.add_row(row, None)
@@ -809,7 +871,8 @@ class ActionTestTable(TestTable):
         row = [
             "with",
             coverage_term_code,
-            term_value
+            term_value,
+            ""
         ]
         self.add_row(row, None)
         return
@@ -821,10 +884,12 @@ class ActionTestTable(TestTable):
         row = [
             "commit",
             "",
+            "",
             ""
         ]
         self.add_row(row, None)
         return
+
 
 # -------------------------------------------------------------------------------
 #  Create Coverages Test Table
@@ -849,6 +914,7 @@ class CreateCoveragesTestTable(ActionTestTable):
         self.role = "CreateCoverages"
         self.role_abbreviation = "CC"
         self.fixture = product_spec.fetch_fixture(self.role)
+        self.coverage_count = 0
         return
 
     # ---------------------------------------------------------------------------
@@ -879,6 +945,7 @@ class CreateCoveragesTestTable(ActionTestTable):
         #
         # Create rows for each coverable
         #
+        self.coverage_count = 0
         coverable_elements = self.product_spec.fetch_coverables()
         assert len(coverable_elements) > 0, "Product must have at least one coverable"
         for coverable_element in coverable_elements:
@@ -917,8 +984,9 @@ class CreateCoveragesTestTable(ActionTestTable):
         #
         # Create the coverage
         #
+        self.coverage_count += 1
         coverage_code = self.product_spec.fetch_coverage_code(coverage_element)
-        self.create_coverage(coverage_code)
+        self.create_coverage(coverage_code, self.coverage_count)
         #
         # Add the coverage terms
         #
@@ -936,5 +1004,9 @@ class CreateCoveragesTestTable(ActionTestTable):
         """
         coverage_term_code = self.product_spec.fetch_text(cov_term_element, "CoverageTermCode")
         term_value = self.product_spec.fetch_coverage_term_value(cov_term_element)
+        assert term_value is not None, "Term value must not be None for coverage term: " + \
+                                       coverage_term_code
+        assert len(term_value) > 0, "Term value must not be empty for coverage term: " + \
+                                    coverage_term_code
         self.add_with(coverage_term_code, term_value)
         return

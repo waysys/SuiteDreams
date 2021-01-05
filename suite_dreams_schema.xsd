@@ -280,14 +280,15 @@ the specification of properties which will be set prior to initiating the quote.
 		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="Role">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="CreateSubmission"></xs:enumeration>
-					<xs:enumeration value="AnswerQuestions"></xs:enumeration>
-					<xs:enumeration value="UpdateDwelling"></xs:enumeration>
-					<xs:enumeration value="CreateCoverages"></xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="CreateSubmission"/>
+						<xs:enumeration value="AnswerQuestions"/>
+						<xs:enumeration value="UpdateDwelling"/>
+						<xs:enumeration value="CreateCoverages"/>
+						<xs:enumeration value="QuoteIssue"></xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:element>
 			<xs:element name="FixtureClass"/>
 		</xs:sequence>
