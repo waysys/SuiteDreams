@@ -708,11 +708,13 @@ class QuiteIssueTestTable(ColumnTestTable):
         self.headings = [
             "TestId",
             "Submission ID",
-            "Quote"
+            "Quote()",
+            "Issue()"
         ]
         self.is_unique = [
             False,
             True,
+            False,
             False
         ]
         return
@@ -742,6 +744,7 @@ class QuiteIssueTestTable(ColumnTestTable):
         row = [
             self.test_id,
             self.submission_id,
+            "true",
             "true"
         ]
         self.add_row(row, None)
